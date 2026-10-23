@@ -1,1 +1,1 @@
-# Man-Cipher is an h t m l file with other that I coded and input into anvpy create an a p k so that my friends and I could manually encrypt and decrypt text to send through any channels
+# Man-Cipher is an h t m l file with other that I coded and input into anvpy create an a p k so that my friends and I could manually encrypt and decrypt text to send through any channels the code for use is 0999666555
