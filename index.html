@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>cryptic_key</title>
+<style>
+  :root{
+    --bg:#0a0e0a;
+    --bg2:#050805;
+    --fg:#33ff66;
+    --fg-dim:#1f8a3a;
+    --fg-bright:#aaffbb;
+    --line:#123d1c;
+    --line-bright:#1f6a2e;
+    --err:#ff4466;
+    --glow:0 0 4px rgba(51,255,102,.6), 0 0 12px rgba(51,255,102,.25);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;padding:0;
+    min-height:100vh;
+    display:flex;flex-direction:column;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        rgba(0,0,0,0) 0px,
+        rgba(0,0,0,0) 2px,
+        rgba(0,0,0,0.18) 3px,
+        rgba(0,0,0,0) 4px
+      ),
+      radial-gradient(ellipse at 50% 0%, #0f1a10 0%, var(--bg) 45%, var(--bg2) 100%);
+    color:var(--fg);
+    font-family:"IBM Plex Mono","JetBrains Mono","Fira Code",
+                ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:14px;line-height:1.5;
+    text-shadow:var(--glow);
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(
+      to bottom,
+      rgba(51,255,102,0.03) 0px,
+      rgba(51,255,102,0.03) 1px,
+      transparent 1px,transparent 3px);
+    z-index:1;
+  }
+  body > *{position:relative;z-index:2}
+
+  .screen{display:none;flex:1;flex-direction:column}
+  .screen.active{display:flex}
+
+  /* ---------------- GATE ---------------- */
+  .gate-wrap{
+    flex:1;
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+  }
+  .terminal{
+    width:100%;max-width:560px;
+    border:1px solid var(--line-bright);
+    background:rgba(5,15,8,0.85);
+    box-shadow:
+      0 0 0 1px rgba(51,255,102,0.15) inset,
+      0 0 40px rgba(51,255,102,0.15),
+      0 0 80px rgba(51,255,102,0.05);
+  }
+  .titlebar{
+    display:flex;align-items:center;gap:8px;
+    padding:8px 12px;
+    border-bottom:1px solid var(--line);
+    background:rgba(20,40,25,0.6);
+    font-size:11px;color:var(--fg-dim);
+    letter-spacing:.15em;text-transform:uppercase;
+  }
+  .titlebar .dots{display:flex;gap:6px;margin-right:8px}
+  .titlebar .dot{width:9px;height:9px;border-radius:50%;background:var(--line-bright)}
+  .titlebar .dot.g{background:#2a8a3f}
+  .titlebar .dot.y{background:#8a7a2a}
+  .titlebar .dot.r{background:#8a2a3a}
+  .titlebar .name{margin-left:auto;color:var(--fg-dim)}
+
+  .t-body{padding:22px 22px 24px}
+
+  .prompt-line{
+    color:var(--fg-dim);font-size:12px;margin-bottom:16px;
+    white-space:pre-wrap;
+  }
+  .prompt-line .user{color:var(--fg)}
+  .prompt-line .path{color:var(--fg-bright)}
+
+  h1.banner{
+    margin:0 0 4px;
+    font-size:clamp(16px,3.2vw,22px);
+    font-weight:700;letter-spacing:.22em;
+    color:var(--fg);
+    text-shadow:var(--glow),0 0 20px rgba(51,255,102,0.5);
+    white-space:pre;
+  }
+  .tagline{
+    margin:0 0 22px;
+    font-size:11px;color:var(--fg-dim);
+    letter-spacing:.12em;text-transform:uppercase;
+  }
+
+  .field{
+    display:flex;align-items:center;gap:8px;
+    border-bottom:1px dashed var(--line-bright);
+    padding:6px 0 8px;margin-bottom:14px;
+  }
+  .field .prompt{color:var(--fg-bright);font-weight:700}
+  .field input{
+    flex:1;min-width:0;
+    background:transparent;border:none;outline:none;
+    color:var(--fg);font:inherit;
+    letter-spacing:.18em;
+    caret-color:var(--fg);
+    text-shadow:var(--glow);
+    padding:4px 0;
+  }
+  .field input::placeholder{color:var(--fg-dim);letter-spacing:.15em;text-shadow:none}
+
+  .btn{
+    display:block;width:100%;
+    font:inherit;cursor:pointer;
+    background:transparent;
+    color:var(--fg);
+    border:1px solid var(--line-bright);
+    padding:10px 14px;
+    text-align:left;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-size:12px;
+    text-shadow:var(--glow);
+    transition:.15s;
+    position:relative;
+  }
+  .btn::before{content:"[ "}
+  .btn::after{content:" ]"}
+  .btn:hover{
+    background:rgba(51,255,102,0.08);
+    border-color:var(--fg);
+    box-shadow:0 0 18px rgba(51,255,102,.25) inset;
+  }
+  .btn:active{transform:translateY(1px)}
+
+  .msg{
+    margin-top:12px;min-height:16px;
+    font-size:11px;color:var(--err);
+    letter-spacing:.1em;text-transform:uppercase;
+    text-shadow:0 0 6px rgba(255,68,102,.6);
+  }
+
+  /* ---------------- MAIN ---------------- */
+  .main-wrap{
+    flex:1;
+    max-width:1000px;width:100%;
+    margin:0 auto;
+    padding:22px 20px 24px;
+    display:flex;flex-direction:column;
+  }
+  .header{
+    text-align:center;margin-bottom:18px;
+  }
+  .header h1{
+    margin:0;
+    font-size:clamp(18px,3.4vw,24px);
+    letter-spacing:.28em;font-weight:700;
+    color:var(--fg);
+    text-shadow:var(--glow),0 0 20px rgba(51,255,102,0.5);
+  }
+  .header .sub{
+    margin:6px 0 0;font-size:11px;color:var(--fg-dim);
+    letter-spacing:.12em;text-transform:uppercase;
+  }
+  .toolbar{
+    display:flex;justify-content:flex-end;gap:8px;
+    margin-bottom:14px;
+  }
+  .toolbar .btn{
+    display:inline-block;width:auto;
+    padding:6px 12px;font-size:11px;letter-spacing:.12em;
+  }
+
+  .cols{
+    display:grid;grid-template-columns:1fr 1fr;gap:16px;
+  }
+  @media (max-width:840px){.cols{grid-template-columns:1fr}}
+
+  .panel{
+    border:1px solid var(--line-bright);
+    background:rgba(5,15,8,0.85);
+    padding:0;
+    display:flex;flex-direction:column;
+    box-shadow:
+      0 0 0 1px rgba(51,255,102,0.08) inset,
+      0 0 30px rgba(51,255,102,0.06);
+  }
+  .panel .ptitle{
+    padding:8px 14px;
+    border-bottom:1px solid var(--line);
+    background:rgba(20,40,25,0.6);
+    font-size:11px;color:var(--fg-dim);
+    letter-spacing:.18em;text-transform:uppercase;
+  }
+  .panel .pbody{padding:14px;display:flex;flex-direction:column;gap:10px}
+
+  textarea{
+    width:100%;min-height:120px;resize:vertical;
+    background:#030805;
+    border:1px solid var(--line);
+    color:var(--fg);
+    font:inherit;padding:10px;
+    outline:none;
+    caret-color:var(--fg);
+    text-shadow:var(--glow);
+    letter-spacing:.02em;
+    transition:border-color .15s,box-shadow .15s;
+  }
+  textarea:focus{
+    border-color:var(--fg);
+    box-shadow:0 0 0 1px rgba(51,255,102,.3),0 0 16px rgba(51,255,102,.15) inset;
+  }
+  textarea.out{color:var(--fg-bright);min-height:90px}
+  textarea::placeholder{color:var(--fg-dim);text-shadow:none}
+
+  .copybtn{
+    align-self:flex-end;
+    font:inherit;cursor:pointer;
+    background:transparent;
+    border:1px solid var(--line-bright);
+    color:var(--fg-dim);
+    padding:5px 10px;
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    transition:.15s;
+  }
+  .copybtn::before{content:"> "}
+  .copybtn:hover{border-color:var(--fg);color:var(--fg)}
+
+  /* ---------------- STATUS TOAST ---------------- */
+  .status{
+    position:fixed;left:50%;bottom:60px;
+    transform:translate(-50%,18px);
+    background:rgba(5,15,8,0.95);
+    border:1px solid var(--fg);
+    color:var(--fg);
+    padding:9px 20px;
+    font-size:12px;
+    letter-spacing:.15em;
+    text-transform:uppercase;
+    text-shadow:var(--glow);
+    opacity:0;pointer-events:none;
+    transition:.22s ease;
+    z-index:20;
+    max-width:90vw;text-align:center;
+    box-shadow:0 0 24px rgba(51,255,102,.25);
+  }
+  .status.show{opacity:1;transform:translate(-50%,0)}
+  .status.error{border-color:var(--err);color:var(--err);text-shadow:0 0 6px rgba(255,68,102,.7);box-shadow:0 0 24px rgba(255,68,102,.25)}
+
+  /* ---------------- FOOTER ---------------- */
+  footer{
+    text-align:center;
+    padding:14px 20px 16px;
+    font-size:11px;
+    color:var(--fg-dim);
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    border-top:1px solid var(--line);
+    background:rgba(5,15,8,0.6);
+    text-shadow:none;
+  }
+  footer .brand{
+    color:var(--fg);
+    text-shadow:var(--glow);
+    letter-spacing:.22em;
+  }
+</style>
+</head>
+<body>
+
+<!-- KEY GATE -->
+<div class="screen active" id="gateScreen">
+  <div class="gate-wrap">
+    <div class="terminal">
+      <div class="titlebar">
+        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+        <span class="name">cryptic_key — /bin/auth</span>
+      </div>
+      <div class="t-body">
+        <div class="prompt-line"><span class="user">root</span>@<span class="path">z-solutions</span>:<span class="path">~</span>$ ./cryptic_key --auth</div>
+        <h1 class="banner">CRYPTIC_KEY</h1>
+        <p class="tagline">// secure terminal · authentication required</p>
+
+        <form id="gateForm" autocomplete="off">
+          <div class="field">
+            <span class="prompt">&gt;</span>
+            <input id="gateKey" type="password" placeholder="enter access key" autofocus spellcheck="false" />
+          </div>
+          <button type="submit" class="btn">unlock</button>
+          <div class="msg" id="gateMsg"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <footer>powered by <span class="brand">Z Solutions</span></footer>
+</div>
+
+<!-- MAIN -->
+<div class="screen" id="mainScreen">
+  <div class="main-wrap">
+    <div class="header">
+      <h1>CRYPTIC_KEY</h1>
+      <p class="sub">// symmetric text encipherment · session active</p>
+    </div>
+
+    <div class="toolbar">
+      <button id="lockBtn" class="btn" type="button">lock session</button>
+    </div>
+
+    <div class="cols">
+      <section class="panel">
+        <div class="ptitle">// encrypt</div>
+        <div class="pbody">
+          <textarea id="plain" placeholder="> type message to encrypt..."></textarea>
+          <button id="encBtn" class="btn" type="button">encrypt →</button>
+          <textarea id="cipherOut" class="out" readonly placeholder="> ciphertext output"></textarea>
+          <button class="copybtn" type="button" data-copy="cipherOut">copy ciphertext</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="ptitle">// decrypt</div>
+        <div class="pbody">
+          <textarea id="cipher" placeholder="> paste ciphertext to decrypt..."></textarea>
+          <button id="decBtn" class="btn" type="button">decrypt →</button>
+          <textarea id="plainOut" class="out" readonly placeholder="> plaintext output"></textarea>
+          <button class="copybtn" type="button" data-copy="plainOut">copy plaintext</button>
+        </div>
+      </section>
+    </div>
+  </div>
+  <footer>powered by <span class="brand">Z Solutions</span></footer>
+</div>
+
+<div id="status" class="status"></div>
+
+<script>
+  const ACCESS_KEY = "0999666555";
+  const NONCE_LEN = 16;
+
+  const $ = (id) => document.getElementById(id);
+  let sessionKey = null;
+  let statusTimer = null;
+
+  function toast(msg, isError) {
+    const el = $("status");
+    el.textContent = msg;
+    el.className = "status show" + (isError ? " error" : "");
+    clearTimeout(statusTimer);
+    statusTimer = setTimeout(() => el.classList.remove("show"), 2800);
+  }
+
+  function show(id) {
+    document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
+    $(id).classList.add("active");
+  }
+
+  async function sha256(bytes) {
+    return new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+  }
+
+  async function keystream(keyBytes, nonce, length) {
+    const out = new Uint8Array(length);
+    let counter = 0, offset = 0;
+    while (offset < length) {
+      const block = new Uint8Array(keyBytes.length + nonce.length + 8);
+      block.set(keyBytes, 0);
+      block.set(nonce, keyBytes.length);
+      new DataView(block.buffer).setBigUint64(
+        keyBytes.length + nonce.length, BigInt(counter), false
+      );
+      const hash = await sha256(block);
+      const take = Math.min(hash.length, length - offset);
+      out.set(hash.subarray(0, take), offset);
+      offset += take;
+      counter++;
+    }
+    return out;
+  }
+
+  function b64urlEncode(bytes) {
+    let bin = "";
+    for (const b of bytes) bin += String.fromCharCode(b);
+    return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+
+  function b64urlDecode(str) {
+    str = str.replace(/-/g, "+").replace(/_/g, "/");
+    while (str.length % 4) str += "=";
+    const bin = atob(str);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+
+  async function encryptText(plaintext, key) {
+    const enc = new TextEncoder();
+    const keyBytes = await sha256(enc.encode(key));
+    const data = enc.encode(plaintext);
+    const nonce = crypto.getRandomValues(new Uint8Array(NONCE_LEN));
+    const stream = await keystream(keyBytes, nonce, data.length);
+    const cipher = new Uint8Array(data.length);
+    for (let i = 0; i < data.length; i++) cipher[i] = data[i] ^ stream[i];
+    const blob = new Uint8Array(NONCE_LEN + cipher.length);
+    blob.set(nonce, 0);
+    blob.set(cipher, NONCE_LEN);
+    return b64urlEncode(blob);
+  }
+
+  async function decryptText(token, key) {
+    const enc = new TextEncoder();
+    const keyBytes = await sha256(enc.encode(key));
+    const raw = b64urlDecode(token.replace(/\s+/g, ""));
+    if (raw.length < NONCE_LEN) throw new Error("ciphertext too short");
+    const nonce = raw.slice(0, NONCE_LEN);
+    const cipher = raw.slice(NONCE_LEN);
+    const stream = await keystream(keyBytes, nonce, cipher.length);
+    const data = new Uint8Array(cipher.length);
+    for (let i = 0; i < cipher.length; i++) data[i] = cipher[i] ^ stream[i];
+    return new TextDecoder().decode(data);
+  }
+
+  $("gateForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const v = $("gateKey").value.trim();
+    if (v === ACCESS_KEY) {
+      sessionKey = v;
+      $("gateMsg").textContent = "";
+      $("gateKey").value = "";
+      show("mainScreen");
+    } else {
+      $("gateMsg").textContent = "access denied";
+      $("gateKey").value = "";
+      $("gateKey").focus();
+    }
+  });
+
+  $("lockBtn").addEventListener("click", () => {
+    sessionKey = null;
+    ["plain","cipher","cipherOut","plainOut"].forEach((id) => $(id).value = "");
+    show("gateScreen");
+    setTimeout(() => $("gateKey").focus(), 50);
+  });
+
+  $("encBtn").addEventListener("click", async () => {
+    if (!sessionKey) { show("gateScreen"); return; }
+    const message = $("plain").value;
+    if (!message.trim()) return toast("nothing to encrypt", true);
+    try {
+      $("cipherOut").value = await encryptText(message, sessionKey);
+      toast("encrypted");
+    } catch (e) { toast("encryption failed", true); }
+  });
+
+  $("decBtn").addEventListener("click", async () => {
+    if (!sessionKey) { show("gateScreen"); return; }
+    const token = $("cipher").value;
+    if (!token.trim()) return toast("nothing to decrypt", true);
+    try {
+      $("plainOut").value = await decryptText(token, sessionKey);
+      toast("decrypted");
+    } catch (e) { toast("decryption failed", true); }
+  });
+
+  document.querySelectorAll("[data-copy]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const v = $(btn.dataset.copy).value;
+      if (!v) return toast("nothing to copy", true);
+      try {
+        await navigator.clipboard.writeText(v);
+        toast("copied");
+      } catch (_) {
+        $(btn.dataset.copy).select();
+        document.execCommand("copy");
+        toast("copied");
+      }
+    });
+  });
+
+  $("plain").addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") $("encBtn").click();
+  });
+  $("cipher").addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") $("decBtn").click();
+  });
+</script>
+</body>
+</html>
