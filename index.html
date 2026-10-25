@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>cryptic_key</title>
+<title>Z1MCIPHOR</title>
 <style>
   :root{
-    --bg:#0a0e0a;
-    --bg2:#050805;
-    --fg:#33ff66;
-    --fg-dim:#1f8a3a;
-    --fg-bright:#aaffbb;
-    --line:#123d1c;
-    --line-bright:#1f6a2e;
+    --bg:#050a14;
+    --bg2:#02060d;
+    --fg:#4db8ff;
+    --fg-dim:#1a5580;
+    --fg-bright:#aaddff;
+    --line:#0f3050;
+    --line-bright:#1a5f96;
     --err:#ff4466;
-    --glow:0 0 4px rgba(51,255,102,.6), 0 0 12px rgba(51,255,102,.25);
+    --glow:0 0 4px rgba(77,184,255,.6), 0 0 12px rgba(77,184,255,.25);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -30,11 +30,11 @@
         rgba(0,0,0,0.18) 3px,
         rgba(0,0,0,0) 4px
       ),
-      radial-gradient(ellipse at 50% 0%, #0f1a10 0%, var(--bg) 45%, var(--bg2) 100%);
+      radial-gradient(ellipse at 50% -10%, #0a1830 0%, var(--bg) 45%, var(--bg2) 100%);
     color:var(--fg);
     font-family:"IBM Plex Mono","JetBrains Mono","Fira Code",
                 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    font-size:14px;line-height:1.5;
+    font-size:13px;line-height:1.4;
     text-shadow:var(--glow);
     -webkit-font-smoothing:antialiased;
   }
@@ -42,174 +42,153 @@
     content:"";position:fixed;inset:0;pointer-events:none;
     background:repeating-linear-gradient(
       to bottom,
-      rgba(51,255,102,0.03) 0px,
-      rgba(51,255,102,0.03) 1px,
+      rgba(77,184,255,0.03) 0px,
+      rgba(77,184,255,0.03) 1px,
       transparent 1px,transparent 3px);
     z-index:1;
   }
   body > *{position:relative;z-index:2}
 
-  .screen{display:none;flex:1;flex-direction:column}
-  .screen.active{display:flex}
-
-  /* ---------------- GATE ---------------- */
-  .gate-wrap{
-    flex:1;
-    display:flex;align-items:center;justify-content:center;
-    padding:24px;
-  }
-  .terminal{
-    width:100%;max-width:560px;
-    border:1px solid var(--line-bright);
-    background:rgba(5,15,8,0.85);
-    box-shadow:
-      0 0 0 1px rgba(51,255,102,0.15) inset,
-      0 0 40px rgba(51,255,102,0.15),
-      0 0 80px rgba(51,255,102,0.05);
-  }
-  .titlebar{
-    display:flex;align-items:center;gap:8px;
-    padding:8px 12px;
+  .menubar{
+    display:flex;align-items:center;gap:4px;
+    padding:4px 8px;
     border-bottom:1px solid var(--line);
-    background:rgba(20,40,25,0.6);
-    font-size:11px;color:var(--fg-dim);
-    letter-spacing:.15em;text-transform:uppercase;
-  }
-  .titlebar .dots{display:flex;gap:6px;margin-right:8px}
-  .titlebar .dot{width:9px;height:9px;border-radius:50%;background:var(--line-bright)}
-  .titlebar .dot.g{background:#2a8a3f}
-  .titlebar .dot.y{background:#8a7a2a}
-  .titlebar .dot.r{background:#8a2a3a}
-  .titlebar .name{margin-left:auto;color:var(--fg-dim)}
-
-  .t-body{padding:22px 22px 24px}
-
-  .prompt-line{
-    color:var(--fg-dim);font-size:12px;margin-bottom:16px;
-    white-space:pre-wrap;
-  }
-  .prompt-line .user{color:var(--fg)}
-  .prompt-line .path{color:var(--fg-bright)}
-
-  h1.banner{
-    margin:0 0 4px;
-    font-size:clamp(16px,3.2vw,22px);
-    font-weight:700;letter-spacing:.22em;
-    color:var(--fg);
-    text-shadow:var(--glow),0 0 20px rgba(51,255,102,0.5);
-    white-space:pre;
-  }
-  .tagline{
-    margin:0 0 22px;
-    font-size:11px;color:var(--fg-dim);
-    letter-spacing:.12em;text-transform:uppercase;
-  }
-
-  .field{
-    display:flex;align-items:center;gap:8px;
-    border-bottom:1px dashed var(--line-bright);
-    padding:6px 0 8px;margin-bottom:14px;
-  }
-  .field .prompt{color:var(--fg-bright);font-weight:700}
-  .field input{
-    flex:1;min-width:0;
-    background:transparent;border:none;outline:none;
-    color:var(--fg);font:inherit;
-    letter-spacing:.18em;
-    caret-color:var(--fg);
-    text-shadow:var(--glow);
-    padding:4px 0;
-  }
-  .field input::placeholder{color:var(--fg-dim);letter-spacing:.15em;text-shadow:none}
-
-  .btn{
-    display:block;width:100%;
-    font:inherit;cursor:pointer;
-    background:transparent;
-    color:var(--fg);
-    border:1px solid var(--line-bright);
-    padding:10px 14px;
-    text-align:left;
-    letter-spacing:.14em;
+    background:rgba(10,25,45,0.9);
+    font-size:11px;
+    letter-spacing:.1em;
     text-transform:uppercase;
-    font-size:12px;
-    text-shadow:var(--glow);
-    transition:.15s;
+    user-select:none;
     position:relative;
+    z-index:40;
   }
-  .btn::before{content:"[ "}
-  .btn::after{content:" ]"}
-  .btn:hover{
-    background:rgba(51,255,102,0.08);
-    border-color:var(--fg);
-    box-shadow:0 0 18px rgba(51,255,102,.25) inset;
+  .menubar .brand{
+    color:var(--fg-bright);
+    font-weight:700;
+    letter-spacing:.18em;
+    margin-right:12px;
+    padding:2px 4px;
+    text-shadow:var(--glow);
   }
-  .btn:active{transform:translateY(1px)}
+  .menubar .menu{position:relative}
+  .menubar .menu > button{
+    font:inherit;
+    background:transparent;border:none;
+    color:var(--fg-dim);
+    padding:4px 10px;
+    cursor:pointer;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    border-radius:3px;
+    transition:.12s;
+  }
+  .menubar .menu > button:hover,
+  .menubar .menu.open > button{
+    color:var(--fg);
+    background:rgba(77,184,255,.1);
+  }
+  .dropdown{
+    display:none;
+    position:absolute;
+    top:100%;left:0;
+    min-width:180px;
+    background:rgba(8,20,36,0.98);
+    border:1px solid var(--line-bright);
+    box-shadow:0 0 24px rgba(77,184,255,.2);
+    padding:4px 0;
+    z-index:50;
+  }
+  .menubar .menu.open .dropdown{display:block}
+  .dropdown button{
+    display:block;
+    width:100%;
+    text-align:left;
+    font:inherit;
+    background:transparent;border:none;
+    color:var(--fg-dim);
+    padding:7px 14px;
+    cursor:pointer;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    font-size:11px;
+    transition:.12s;
+  }
+  .dropdown button:hover{
+    background:rgba(77,184,255,.12);
+    color:var(--fg-bright);
+  }
+  .dropdown .sep{
+    height:1px;
+    background:var(--line);
+    margin:4px 0;
+  }
 
-  .msg{
-    margin-top:12px;min-height:16px;
-    font-size:11px;color:var(--err);
-    letter-spacing:.1em;text-transform:uppercase;
-    text-shadow:0 0 6px rgba(255,68,102,.6);
+  #clock{
+    margin-left:auto;
+    font-size:11px;
+    letter-spacing:.14em;
+    color:var(--fg-dim);
+    text-transform:uppercase;
+    user-select:none;
+    padding-right:4px;
+  }
+  #clock .t{
+    color:var(--fg-bright);
+    text-shadow:var(--glow);
   }
 
-  /* ---------------- MAIN ---------------- */
   .main-wrap{
     flex:1;
-    max-width:1000px;width:100%;
+    max-width:960px;width:100%;
     margin:0 auto;
-    padding:22px 20px 24px;
+    padding:14px 14px 16px;
     display:flex;flex-direction:column;
   }
-  .header{
-    text-align:center;margin-bottom:18px;
-  }
+  .main-wrap.minimized{display:none}
+
+  .header{text-align:center;margin-bottom:12px}
   .header h1{
     margin:0;
-    font-size:clamp(18px,3.4vw,24px);
-    letter-spacing:.28em;font-weight:700;
+    font-size:clamp(14px,2.8vw,18px);
+    letter-spacing:.24em;font-weight:700;
     color:var(--fg);
-    text-shadow:var(--glow),0 0 20px rgba(51,255,102,0.5);
+    text-shadow:var(--glow),0 0 18px rgba(77,184,255,0.5);
+    text-transform:uppercase;
   }
   .header .sub{
-    margin:6px 0 0;font-size:11px;color:var(--fg-dim);
-    letter-spacing:.12em;text-transform:uppercase;
-  }
-  .toolbar{
-    display:flex;justify-content:flex-end;gap:8px;
-    margin-bottom:14px;
-  }
-  .toolbar .btn{
-    display:inline-block;width:auto;
-    padding:6px 12px;font-size:11px;letter-spacing:.12em;
+    margin:3px 0 0;font-size:10px;color:var(--fg-dim);
+    letter-spacing:.14em;text-transform:uppercase;
   }
 
-  .cols{
-    display:grid;grid-template-columns:1fr 1fr;gap:16px;
-  }
-  @media (max-width:840px){.cols{grid-template-columns:1fr}}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:700px){.cols{grid-template-columns:1fr}}
 
   .panel{
     border:1px solid var(--line-bright);
-    background:rgba(5,15,8,0.85);
+    background:rgba(3,10,20,0.85);
     padding:0;
     display:flex;flex-direction:column;
     box-shadow:
-      0 0 0 1px rgba(51,255,102,0.08) inset,
-      0 0 30px rgba(51,255,102,0.06);
+      0 0 0 1px rgba(77,184,255,0.08) inset,
+      0 0 24px rgba(77,184,255,0.06);
   }
   .panel .ptitle{
-    padding:8px 14px;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:6px 12px;
     border-bottom:1px solid var(--line);
-    background:rgba(20,40,25,0.6);
-    font-size:11px;color:var(--fg-dim);
+    background:rgba(15,40,70,0.6);
+    font-size:10px;color:var(--fg-dim);
     letter-spacing:.18em;text-transform:uppercase;
   }
-  .panel .pbody{padding:14px;display:flex;flex-direction:column;gap:10px}
+  .panel .ptitle .tag{
+    color:var(--fg-dim);font-size:9px;
+    letter-spacing:.14em;opacity:.7;
+  }
+  .panel .ptitle .tag.out{color:var(--fg-bright);opacity:1}
+  .panel .pbody{padding:10px;display:flex;flex-direction:column;gap:8px}
 
   textarea{
-    width:100%;min-height:120px;resize:vertical;
-    background:#030805;
+    width:100%;min-height:150px;resize:vertical;
+    background:#020610;
     border:1px solid var(--line);
     color:var(--fg);
     font:inherit;padding:10px;
@@ -217,61 +196,113 @@
     caret-color:var(--fg);
     text-shadow:var(--glow);
     letter-spacing:.02em;
-    transition:border-color .15s,box-shadow .15s;
+    transition:border-color .15s,box-shadow .15s,color .15s;
+    word-break:break-all;
   }
   textarea:focus{
     border-color:var(--fg);
-    box-shadow:0 0 0 1px rgba(51,255,102,.3),0 0 16px rgba(51,255,102,.15) inset;
+    box-shadow:0 0 0 1px rgba(77,184,255,.3),0 0 14px rgba(77,184,255,.15) inset;
   }
-  textarea.out{color:var(--fg-bright);min-height:90px}
+  textarea.out{color:var(--fg-bright);border-color:var(--line-bright)}
   textarea::placeholder{color:var(--fg-dim);text-shadow:none}
 
-  .copybtn{
-    align-self:flex-end;
+  .btnrow{display:flex;gap:6px}
+  .btn{
+    flex:1;
+    display:block;
     font:inherit;cursor:pointer;
     background:transparent;
+    color:var(--fg);
     border:1px solid var(--line-bright);
-    color:var(--fg-dim);
-    padding:5px 10px;
+    padding:8px 10px;
+    text-align:center;
+    letter-spacing:.12em;
+    text-transform:uppercase;
     font-size:11px;
+    text-shadow:var(--glow);
+    transition:.15s;
+  }
+  .btn::before{content:"[ "}
+  .btn::after{content:" ]"}
+  .btn:hover{
+    background:rgba(77,184,255,0.08);
+    border-color:var(--fg);
+    box-shadow:0 0 14px rgba(77,184,255,.25) inset;
+  }
+  .btn:active{transform:translateY(1px)}
+
+  .copybtn{
+    font:inherit;cursor:pointer;
+    background:rgba(77,184,255,0.05);
+    border:1px solid var(--line-bright);
+    color:var(--fg);
+    padding:7px 10px;
+    font-size:10px;
     letter-spacing:.12em;
     text-transform:uppercase;
     transition:.15s;
+    white-space:nowrap;
+    text-shadow:var(--glow);
   }
   .copybtn::before{content:"> "}
-  .copybtn:hover{border-color:var(--fg);color:var(--fg)}
+  .copybtn:hover{
+    border-color:var(--fg);
+    color:var(--fg-bright);
+    background:rgba(77,184,255,0.15);
+    box-shadow:0 0 12px rgba(77,184,255,.3);
+  }
+  .copybtn:active{transform:translateY(1px)}
 
-  /* ---------------- STATUS TOAST ---------------- */
   .status{
-    position:fixed;left:50%;bottom:60px;
+    position:fixed;left:50%;bottom:50px;
     transform:translate(-50%,18px);
-    background:rgba(5,15,8,0.95);
+    background:rgba(3,10,20,0.95);
     border:1px solid var(--fg);
     color:var(--fg);
-    padding:9px 20px;
-    font-size:12px;
+    padding:8px 18px;
+    font-size:11px;
     letter-spacing:.15em;
     text-transform:uppercase;
     text-shadow:var(--glow);
     opacity:0;pointer-events:none;
     transition:.22s ease;
-    z-index:20;
+    z-index:60;
     max-width:90vw;text-align:center;
-    box-shadow:0 0 24px rgba(51,255,102,.25);
+    box-shadow:0 0 20px rgba(77,184,255,.25);
   }
   .status.show{opacity:1;transform:translate(-50%,0)}
-  .status.error{border-color:var(--err);color:var(--err);text-shadow:0 0 6px rgba(255,68,102,.7);box-shadow:0 0 24px rgba(255,68,102,.25)}
+  .status.error{
+    border-color:var(--err);color:var(--err);
+    text-shadow:0 0 6px rgba(255,68,102,.7);
+    box-shadow:0 0 20px rgba(255,68,102,.25);
+  }
 
-  /* ---------------- FOOTER ---------------- */
+  .closed{
+    display:none;
+    flex:1;
+    align-items:center;justify-content:center;
+    flex-direction:column;
+    gap:16px;
+    padding:24px;
+    text-align:center;
+  }
+  .closed.show{display:flex}
+  .closed .msg{
+    color:var(--fg-dim);
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    font-size:11px;
+  }
+
   footer{
     text-align:center;
-    padding:14px 20px 16px;
-    font-size:11px;
+    padding:10px 16px 12px;
+    font-size:10px;
     color:var(--fg-dim);
     letter-spacing:.18em;
     text-transform:uppercase;
     border-top:1px solid var(--line);
-    background:rgba(5,15,8,0.6);
+    background:rgba(3,10,20,0.6);
     text-shadow:none;
   }
   footer .brand{
@@ -279,96 +310,212 @@
     text-shadow:var(--glow);
     letter-spacing:.22em;
   }
+
+  .modal-bg{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(0,5,12,0.75);
+    z-index:70;
+    align-items:center;justify-content:center;
+    padding:20px;
+  }
+  .modal-bg.show{display:flex}
+  .modal{
+    width:100%;max-width:380px;
+    background:rgba(8,20,36,0.98);
+    border:1px solid var(--line-bright);
+    box-shadow:0 0 40px rgba(77,184,255,.25);
+    padding:22px 22px 18px;
+  }
+  .modal h2{
+    margin:0 0 12px;
+    font-size:12px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--fg-bright);
+    text-shadow:var(--glow);
+  }
+  .modal p{
+    margin:0 0 6px;
+    font-size:12px;
+    color:var(--fg);
+    letter-spacing:.04em;
+  }
+  .modal .dim{color:var(--fg-dim);font-size:11px;letter-spacing:.08em}
+  .modal .close{
+    margin-top:16px;
+    width:100%;
+    font:inherit;cursor:pointer;
+    background:transparent;
+    border:1px solid var(--line-bright);
+    color:var(--fg);
+    padding:8px 10px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-size:11px;
+    transition:.15s;
+  }
+  .modal .close:hover{
+    background:rgba(77,184,255,.1);
+    border-color:var(--fg);
+  }
 </style>
 </head>
 <body>
 
-<!-- KEY GATE -->
-<div class="screen active" id="gateScreen">
-  <div class="gate-wrap">
-    <div class="terminal">
-      <div class="titlebar">
-        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
-        <span class="name">cryptic_key — /bin/auth</span>
-      </div>
-      <div class="t-body">
-        <div class="prompt-line"><span class="user">root</span>@<span class="path">z-solutions</span>:<span class="path">~</span>$ ./cryptic_key --auth</div>
-        <h1 class="banner">CRYPTIC_KEY</h1>
-        <p class="tagline">// secure terminal · authentication required</p>
+<div class="menubar">
+  <span class="brand">Z1MCIPHOR</span>
 
-        <form id="gateForm" autocomplete="off">
-          <div class="field">
-            <span class="prompt">&gt;</span>
-            <input id="gateKey" type="password" placeholder="enter access key" autofocus spellcheck="false" />
-          </div>
-          <button type="submit" class="btn">unlock</button>
-          <div class="msg" id="gateMsg"></div>
-        </form>
-      </div>
+  <div class="menu" id="fileMenu">
+    <button type="button" data-toggle="fileMenu">File</button>
+    <div class="dropdown">
+      <button type="button" id="miMinimize">Minimize</button>
+      <button type="button" id="miClose">Close</button>
     </div>
   </div>
-  <footer>powered by <span class="brand">Z Solutions</span></footer>
+
+  <div class="menu" id="helpMenu">
+    <button type="button" data-toggle="helpMenu">Help</button>
+    <div class="dropdown">
+      <button type="button" id="miAbout">About</button>
+    </div>
+  </div>
+
+  <div id="clock"><span class="t" id="clockTime">--:--:--</span></div>
 </div>
 
-<!-- MAIN -->
-<div class="screen" id="mainScreen">
-  <div class="main-wrap">
-    <div class="header">
-      <h1>CRYPTIC_KEY</h1>
-      <p class="sub">// symmetric text encipherment · session active</p>
-    </div>
-
-    <div class="toolbar">
-      <button id="lockBtn" class="btn" type="button">lock session</button>
-    </div>
-
-    <div class="cols">
-      <section class="panel">
-        <div class="ptitle">// encrypt</div>
-        <div class="pbody">
-          <textarea id="plain" placeholder="> type message to encrypt..."></textarea>
-          <button id="encBtn" class="btn" type="button">encrypt →</button>
-          <textarea id="cipherOut" class="out" readonly placeholder="> ciphertext output"></textarea>
-          <button class="copybtn" type="button" data-copy="cipherOut">copy ciphertext</button>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="ptitle">// decrypt</div>
-        <div class="pbody">
-          <textarea id="cipher" placeholder="> paste ciphertext to decrypt..."></textarea>
-          <button id="decBtn" class="btn" type="button">decrypt →</button>
-          <textarea id="plainOut" class="out" readonly placeholder="> plaintext output"></textarea>
-          <button class="copybtn" type="button" data-copy="plainOut">copy plaintext</button>
-        </div>
-      </section>
-    </div>
+<div class="main-wrap" id="mainWrap">
+  <div class="header">
+    <h1>Z1MCIPHOR</h1>
+    <p class="sub">// symmetric text encipherment</p>
   </div>
-  <footer>powered by <span class="brand">Z Solutions</span></footer>
+
+  <div class="cols">
+    <section class="panel">
+      <div class="ptitle">
+        <span>// encrypt</span>
+        <span class="tag" id="encTag">input</span>
+      </div>
+      <div class="pbody">
+        <textarea id="encBox" placeholder="> type message to encrypt..."></textarea>
+        <div class="btnrow">
+          <button id="encBtn" class="btn" type="button">encrypt →</button>
+          <button class="copybtn" type="button" data-copy="encBox">copy</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="ptitle">
+        <span>// decrypt</span>
+        <span class="tag" id="decTag">input</span>
+      </div>
+      <div class="pbody">
+        <textarea id="decBox" readonly></textarea>
+        <div class="btnrow">
+          <button id="decBtn" class="btn" type="button">decrypt →</button>
+          <button class="copybtn" type="button" data-copy="decBox">copy</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="closed" id="closedScreen">
+  <div class="msg">// application closed</div>
+  <button id="reopenBtn" class="btn" type="button" style="max-width:220px">reopen</button>
+</div>
+
+<footer>Powered by <span class="brand">Z Solutions</span></footer>
+
+<div class="modal-bg" id="aboutModal">
+  <div class="modal">
+    <h2>About</h2>
+    <p>Z1MCIPHOR</p>
+    <p class="dim">by Louis Zimmer</p>
+    <p class="dim">Z Solutions</p>
+    <button class="close" id="aboutClose" type="button">close</button>
+  </div>
 </div>
 
 <div id="status" class="status"></div>
 
 <script>
-  const ACCESS_KEY = "0999666555";
+  const KEY = "0999666555";
   const NONCE_LEN = 16;
 
   const $ = (id) => document.getElementById(id);
-  let sessionKey = null;
   let statusTimer = null;
+
+  function pad(n){ return String(n).padStart(2, "0"); }
+  function tickClock(){
+    const d = new Date();
+    $("clockTime").textContent =
+      pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+  }
+  tickClock();
+  setInterval(tickClock, 1000);
 
   function toast(msg, isError) {
     const el = $("status");
     el.textContent = msg;
     el.className = "status show" + (isError ? " error" : "");
     clearTimeout(statusTimer);
-    statusTimer = setTimeout(() => el.classList.remove("show"), 2800);
+    statusTimer = setTimeout(() => el.classList.remove("show"), 2500);
   }
 
-  function show(id) {
-    document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
-    $(id).classList.add("active");
+  function closeAllMenus() {
+    document.querySelectorAll(".menu").forEach((m) => m.classList.remove("open"));
   }
+
+  document.querySelectorAll("[data-toggle]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.toggle;
+      const menu = $(id);
+      const wasOpen = menu.classList.contains("open");
+      closeAllMenus();
+      if (!wasOpen) menu.classList.add("open");
+    });
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest || !e.target.closest(".menu")) {
+      closeAllMenus();
+    }
+  }, true);
+
+  $("miMinimize").addEventListener("click", () => {
+    closeAllMenus();
+    const wrap = $("mainWrap");
+    const hidden = wrap.classList.toggle("minimized");
+    toast(hidden ? "minimized — File > Minimize to restore" : "restored");
+  });
+
+  $("miClose").addEventListener("click", () => {
+    closeAllMenus();
+    $("mainWrap").style.display = "none";
+    $("closedScreen").classList.add("show");
+    toast("closed");
+  });
+
+  $("reopenBtn").addEventListener("click", () => {
+    $("closedScreen").classList.remove("show");
+    $("mainWrap").style.display = "";
+    $("mainWrap").classList.remove("minimized");
+    toast("reopened");
+  });
+
+  $("miAbout").addEventListener("click", () => {
+    closeAllMenus();
+    $("aboutModal").classList.add("show");
+  });
+  $("aboutClose").addEventListener("click", () => {
+    $("aboutModal").classList.remove("show");
+  });
+  $("aboutModal").addEventListener("click", (e) => {
+    if (e.target === $("aboutModal")) $("aboutModal").classList.remove("show");
+  });
 
   async function sha256(bytes) {
     return new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
@@ -435,46 +582,65 @@
     return new TextDecoder().decode(data);
   }
 
-  $("gateForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const v = $("gateKey").value.trim();
-    if (v === ACCESS_KEY) {
-      sessionKey = v;
-      $("gateMsg").textContent = "";
-      $("gateKey").value = "";
-      show("mainScreen");
-    } else {
-      $("gateMsg").textContent = "access denied";
-      $("gateKey").value = "";
-      $("gateKey").focus();
-    }
-  });
+  function markOut(boxId, tagId) {
+    $(boxId).classList.add("out");
+    $(boxId).readOnly = true;
+    $(tagId).textContent = "output";
+    $(tagId).classList.add("out");
+  }
 
-  $("lockBtn").addEventListener("click", () => {
-    sessionKey = null;
-    ["plain","cipher","cipherOut","plainOut"].forEach((id) => $(id).value = "");
-    show("gateScreen");
-    setTimeout(() => $("gateKey").focus(), 50);
-  });
+  function markIn(boxId, tagId) {
+    $(boxId).classList.remove("out");
+    $(boxId).readOnly = false;
+    $(tagId).textContent = "input";
+    $(tagId).classList.remove("out");
+  }
 
   $("encBtn").addEventListener("click", async () => {
-    if (!sessionKey) { show("gateScreen"); return; }
-    const message = $("plain").value;
+    const box = $("encBox");
+    if (box.readOnly) {
+      box.value = "";
+      markIn("encBox", "encTag");
+      box.placeholder = "> type message to encrypt...";
+      box.focus();
+      return;
+    }
+    const message = box.value;
     if (!message.trim()) return toast("nothing to encrypt", true);
     try {
-      $("cipherOut").value = await encryptText(message, sessionKey);
+      box.value = await encryptText(message, KEY);
+      markOut("encBox", "encTag");
       toast("encrypted");
     } catch (e) { toast("encryption failed", true); }
   });
 
   $("decBtn").addEventListener("click", async () => {
-    if (!sessionKey) { show("gateScreen"); return; }
-    const token = $("cipher").value;
-    if (!token.trim()) return toast("nothing to decrypt", true);
+    const src = $("encBox");
+    const dest = $("decBox");
+
+    if (!src.readOnly || !src.value.trim()) {
+      return toast("encrypt a message first", true);
+    }
+
     try {
-      $("plainOut").value = await decryptText(token, sessionKey);
+      const plain = await decryptText(src.value, KEY);
+      dest.value = plain;
+      markOut("decBox", "decTag");
       toast("decrypted");
-    } catch (e) { toast("decryption failed", true); }
+    } catch (e) {
+      dest.value = "";
+      markIn("decBox", "decTag");
+      toast("decryption failed", true);
+    }
+  });
+
+  $("encBox").addEventListener("click", () => {
+    const box = $("encBox");
+    if (box.readOnly) {
+      box.value = "";
+      markIn("encBox", "encTag");
+      box.placeholder = "> type message to encrypt...";
+    }
   });
 
   document.querySelectorAll("[data-copy]").forEach((btn) => {
@@ -492,11 +658,8 @@
     });
   });
 
-  $("plain").addEventListener("keydown", (e) => {
+  $("encBox").addEventListener("keydown", (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") $("encBtn").click();
-  });
-  $("cipher").addEventListener("keydown", (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") $("decBtn").click();
   });
 </script>
 </body>
